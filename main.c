@@ -18,7 +18,6 @@ int main(){
 
     printf ("voici la solution :\n");
 
-
     for (i=0; i<81 ; i ++){
         if (sudoku[i] == 0){
             j++ ;
@@ -33,7 +32,6 @@ int main(){
         }
     }
     Solvetableau (sudoku, tab , j);
-
 
     affiche (sudoku);
     return 0;
@@ -249,13 +247,13 @@ int TestCarre (int *place , int tableau[81]){
 void Solvetableau (int tableau[81], int **tab, int j){
     int i = 0 ,l=0 ; int k=0 ; int n =0 ;
     do{
-        if( (TestLigne(*(tab + k) , tableau))*(TestColonne(*(tab + k) , tableau))*( TestCarre(*(tab + k) , tableau))==1 ){
+        if( (TestLigne(*(tab + k) , tableau))*(TestColonne(*(tab + k) , tableau))*( TestCare(*(tab + k) , tableau))==1 ){
             k ++ ;
         }
-        else if ( (TestLigne(*(tab + k) , tableau))*(TestColonne(*(tab + k) , tableau))*(TestCarre(*(tab + k) , tableau))!=1 && **(tab + k) != 9){
+        else if ( (TestLigne(*(tab + k) , tableau))*(TestColonne(*(tab + k) , tableau))*(TestCare(*(tab + k) , tableau))!=1 && **(tab + k) != 9){
             **(tab+k) = **(tab + k) + 1;
         }
-        else if ( (TestLigne( *(tab + k) , tableau))*(TestColonne(*(tab + k) , tableau))*(TestCarre(*(tab + k) , tableau))!=1 && **(tab + k) == 9 ){
+        else if ( (TestLigne( *(tab + k) , tableau))*(TestColonne(*(tab + k) , tableau))*(TestCare(*(tab + k) , tableau))!=1 && **(tab + k) == 9 ){
            if ( **(tab+k) == 9 && **(tab + k + 1) != 9 ){
                 **(tab + k + 1) = **(tab + k + 1) + 1 ;
                 **(tab + k )= 1;
@@ -277,7 +275,27 @@ void Solvetableau (int tableau[81], int **tab, int j){
         for (i = 0; i<j;i++){
             n *= TestLigne (*(tab+i),tableau);
             n *= TestColonne (*(tab +i),tableau);
-            n *= TestCarre(*(tab+i),tableau);
+            n *= TestCare(*(tab+i),tableau);
         }
     }while ( n != 1 );
 }
+
+int TestCare (int *Place, int tableau[81]){
+    int i,j,k = 0; int NbATrouver = 1 , comptage = 0;
+        for (k=0 ; k < 9 ; k++ ){
+            for (j= (*Place - *Place%3)-(((*Place - *Place%3)%27-((*Place - *Place%3)%27)%9)%8)*9 ; j < (*Place - *Place%3)-(((*Place - *Place%3)%27-((*Place - *Place%3)%27)%9)%8)*9 +3 ; j ++){
+                for (i=0; i < 3 ; i++){
+                    if (tableau[j + i * 9] == NbATrouver){
+                        comptage ++ ; NbATrouver ++;
+                    }
+                }
+            }
+        }
+        if (comptage == 9){
+            return 1 ;
+        }
+        else {
+            return 0 ;
+        }
+}
+
