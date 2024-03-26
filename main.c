@@ -2,10 +2,24 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "buffer.h"
+#include "SudokuSetChecker.h"
+/*
 #include "sudoku.h"
 #include "sudokuSolve.h"
+*/
+
 int main(){
+
+
+    SudokuSetChecker a;
+    a.set[0] = 10;
+
+    printf("Case 0 : %d\n", a.set[0]);
+
+    SudokuSetChecker_set(&a, 0, 5);
+    printf("Case 0 : %d\n", a.set[0]);
+    /*
+
     struct Sudoku sudoku ;
     int i = 0;
     sudoku.ligne = 9 ;
@@ -32,5 +46,6 @@ int main(){
     Solve (sudoku,tabTemp);
 
     affiche (sudoku);
+    */
 }
 
