@@ -1,103 +1,67 @@
 #ifndef SUDOKUSOLVE_H_INCLUDED
 #define SUDOKUSOLVE_H_INCLUDED
-#include "buffer.h"
 #include "sudoku.h"
+#define SUDOKU_LINE_SIZE 9
 
-int VerificationLigne (struct Sudoku sudoku, struct TabTemp tabTemp , int ligne);
-int VerificationAllLigne (struct Sudoku sudoku,struct TabTemp tabTemp );
-int VerificationColonne (struct Sudoku sudoku, struct TabTemp tabTemp, int colonne);
-int VerificationAllColonne (struct Sudoku sudoku,struct TabTemp tabTemp);
-int VerificationCarre (struct Sudoku sudoku,struct TabTemp tabTemp, int numero);
-int VerificationAllCarre (struct Sudoku sudoku, struct TabTemp tabTemp);
-void Solve (struct Sudoku sudoku, struct TabTemp tabTemp );
-void SetTabIndiceZero (struct Sudoku sudoku);
+void Sudoku_Solve(Sudoku* sudoku_Solver , SudokuSetChecker* sudokuSetChecker);
+void Sudoku_addOne(Sudoku* sudoku_solver, int* Index);
+void SetTabIndiceZero (Sudoku *sudoku_Solver);
 
-int VerificationLigne (struct Sudoku sudoku, struct TabTemp tabTemp , int ligne){
-    int i = 0;
-    for (i=0; i < sudoku.colonne ; i ++){
-        tabTemp.tabTemp[sudoku.tab[(ligne-1)*sudoku.colonne + i]] = '1';
+ typedef struct strSudoku_solver{
+    int *tab;
+    int *tabIndexZero;
+    int tabIndexZeroSize;
+    } Sudoku_Solver;
+
+
+void Sudoku_Solver_AddOne(Sudoku* sudoku_Solver,int Index){
+    sudoku_Solver->tab[tabIndexZero[Index]]+= 1;
+    if (sudoku_Solver->tabIndexZero[tabIndexZeroSize-1] == 10 && sudoku_Solver->tab[0]==9){
+        Printf ("le sudoku n'est pas faisable");
+        exit ;
     }
-    tabTemp.tabTemp[sudoku.ligne] = '\0';
-    if ( strcmp(tabTemp.tabTemp, '111111111') == 0 ){
-        return 1 ;
-    }
-    else{
-    return 0;
+    if (sudoku_Solver->tab[Index] == 10){
+        sudoku_Solver->tab[Index] = 1;
+        Sudoku_Solver_AddOne(sudoku_Solver, Index + 1);
     }
 }
 
-int VerificationAllLigne (struct Sudoku sudoku,struct TabTemp tabTemp ){
-    int a = 1 ; int i = 0 ;
-    for (i=1; i < sudoku.ligne + 1 ; i++ ){
-        a *= VerificationLigne (sudoku, tabTemp ,i);
-    }
-    return a ;
-}
+void Sudoku_Solver_Solve(Sudoku* sudoku, SudokuSetChecker* sudokuSetChecker){
+    int k;
 
-int VerificationColonne (struct Sudoku sudoku, struct TabTemp tabTemp, int colonne){
-    int i =0;
-    for (i=0; i < sudoku.ligne ; i ++){
-        tabTemp.tabTemp[sudoku.tab[colonne-1 + i*sudoku.ligne]] = '1';
-    }
-    tabTemp.tabTemp[sudoku.ligne]='\0';
-    if ( strcmp (tabTemp.tabTemp, "111111111")==0){
-        return 1 ;
-    }
-    else{
-    return 0;
-    }
-}
+    struct Sudoku_Solver sudoku_solver ;
 
-int VerificationAllColonne (struct Sudoku sudoku, struct TabTemp tabTemp){
-    int a = 1 ; int i = 0 ;
-    for (i=1; i < sudoku.colonne + 1 ; i++ ){
-        a *= VerificationColonne (sudoku, tabTemp, i);
+    for (int i=0;i<SUDOKU_LINE_SIZE*SUDOKU_LINE_SIZE;i++){
+        sudoku_Solver->tab[i] = sudoku[i];
     }
-    return a ;
-}
 
-int VerificationCarre (struct Sudoku sudoku,struct TabTemp tabTemp, int numero){
-    int i = 0 ;
-    int indiceDepart = ((numero-1)/(sudoku.ligne/3))*(sudoku.colonne*3) + (numero%(sudoku.ligne/3))*(sudoku.ligne/3);
-    for (i = 0 ; i < sudoku.ligne ; i++){
-        tabTemp.tabTemp[sudoku.tab[indiceDepart + i + (i/(sudoku.ligne/3))*sudoku.ligne]] = '1' ;
-    }
-    tabTemp.tabTemp[sudoku.ligne]='\0';
-    if ( strcmp (tabTemp.tabTemp, "111111111")==0){
-        return 1 ;
-    }
-    else{
-    return 0;
-    }
-}
+    void SetTabIndiceZero (Sudoku *sudoku_Solver){
+    int k = 0 ;
+        for (int i=0;i<SUDOKU_LINE_SIZE;i++){ // set nombre de zéro
+            for(int j=0;j<SUDOKU_LINE_SIZE;j++){
+                if (sudoku->tab[i*SUDOKU_LINE_SIZE + j] == 0){
+                    k++ ;
+                }
+            }
+        }
+        Sudoku_Solver->tabIndexZeroSize = k ;
+        Sudoku_Solver->tabIndexZero = (int *)malloc(k * sizeof(int));
 
-int VerificationAllCarre (struct Sudoku sudoku, struct TabTemp tabTemp){
-    int i=0 ; int j=1;
-    for (i=0;i<sudoku.ligne/3;i++){
-        j *= VerificationCarre(sudoku, tabTemp, i);
-    }
-        return j;
-}
+        k=0;
 
-void SetTabIndiceZero (struct Sudoku sudoku){
-    int i,j = 0 ; int k = 0 ;
-    for (i=0;i<sudoku.ligne;i++){
-        for(j=0;j<sudoku.colonne;j++){
-            if (sudoku.tab[i*sudoku.colonne + j] == 0){
-                sudoku.tabIndexZero[k] = i*sudoku.colonne + j ;
-                k++ ;
+        for (int i=0;i<SUDOKU_LINE_SIZE;i++){ // set les indives des zéros
+            for(int j=0;j<SUDOKU_LINE_SIZE;j++){
+                if (sudoku->tab[i*SUDOKU_LINE_SIZE + j] == 0){
+                    Sudoku_Solver->tabIndexZero[k] = i*SUDOKU_LINE_SIZE +j ;
+                }
             }
         }
     }
-    sudoku.tabIndexZero[k] = -1 ;
-}
 
-void Solve (struct Sudoku sudoku, struct TabTemp tabTemp){
-    int k = 1;
     do{
-    k=1;
-        AjouteUnCaseSudoku (sudoku, sudoku.tabIndexZero[0]) ;
-        k = VerificationAllCarre (sudoku, tabTemp)* VerificationAllLigne(sudoku,tabTemp) * VerificationAllColonne(sudoku,tabTemp);
+        k = 1;
+        Sudoku__Solver_AddOne (sudoku, sudoku->tabIndexZero[0]) ;
+        k = Sudoku_Check(sudoku,sudokuSetChecker);
     }while (k != 1);
 }
 
