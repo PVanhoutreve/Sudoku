@@ -15,8 +15,8 @@ void SetTabIndiceZero (Sudoku *sudoku_Solver);
 
 
 void Sudoku_Solver_AddOne(Sudoku* sudoku_Solver,int Index){
-    sudoku_Solver->tab[tabIndexZero[Index]]+= 1;
-    if (sudoku_Solver->tabIndexZero[tabIndexZeroSize-1] == 10 && sudoku_Solver->tab[0]==9){
+    sudoku_Solver->tab[tabIndexZero[Index]] += 1;
+    if (sudoku_Solver->tabIndexZero[tabIndexZeroSize-1] == 10 && sudoku_Solver->tab[0]==10){
         Printf ("le sudoku n'est pas faisable");
         exit ;
     }
