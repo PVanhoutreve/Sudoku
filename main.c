@@ -8,7 +8,7 @@
 
 int main() {
     Sudoku* sudoku = NULL;
-    //sudoku->tab = malloc(SUDOKU_LINE_SIZE*SUDOKU_LINE_SIZE*sizeof(int)) ;
+    sudoku->tab = malloc(SUDOKU_LINE_SIZE*SUDOKU_LINE_SIZE*sizeof(int)) ;
     //sudoku->tabIndexZero = malloc(SUDOKU_LINE_SIZE*SUDOKU_LINE_SIZE*sizeof(int)) ;
     //sudoku->tabIndexZeroSize = 0;
 
