@@ -1,5 +1,5 @@
-#ifndef SUDOKUSOLVE_H_INCLUDED
-#define SUDOKUSOLVE_H_INCLUDED
+#ifndef SUDOKU_SOLVER_H_INCLUDED
+#define SUDOKU_SOLVER_H_INCLUDED
 #include "sudoku.h"
 #include <stdlib.h>
 #define SUDOKU_LINE_SIZE 9
@@ -14,14 +14,7 @@ void Sudoku_Solver_AddOne(Sudoku_Solver* sudoku_solver, int Index);
 void SetTabIndiceZero(Sudoku_Solver* sudoku_solver);
 void Sudoku_Solver_Solve(Sudoku* sudoku, int* sudokuSetChecker);
 
-void Sudoku_Solver_AddOne(Sudoku_Solver* sudoku_Solver, int Index) {
-    sudoku_Solver->tab[sudoku_Solver->tabIndexZero[Index]] += 1;
-    
-    if (sudoku_Solver->tab[Index] == 10) {
-        sudoku_Solver->tab[Index] = 1;
-        Sudoku_Solver_AddOne(sudoku_Solver, Index + 1);
-    }
-}
+
 
 void SetTabIndiceZero(Sudoku_Solver* sudoku_solver) {
     int k = 0;
@@ -33,7 +26,7 @@ void SetTabIndiceZero(Sudoku_Solver* sudoku_solver) {
         }
     }
     sudoku_solver->tabIndexZeroSize = k;
-    sudoku_solver->tabIndexZero = (int*)malloc(k * sizeof(int));
+    sudoku_solver->tabIndexZero = malloc(k * sizeof(int));
 
     k = 0;
 
@@ -42,17 +35,30 @@ void SetTabIndiceZero(Sudoku_Solver* sudoku_solver) {
             if (sudoku_solver->tab[i * SUDOKU_LINE_SIZE + j] == 0) {
                 sudoku_solver->tabIndexZero[k] = i * SUDOKU_LINE_SIZE + j;
                 sudoku_solver->tab[sudoku_solver->tabIndexZero[k]] = 1;// on met tous les zéros à un avec la bonne place
+                k++;
             }
         }
+    }
+}
+
+void Sudoku_Solver_AddOne(Sudoku_Solver* sudoku_solver, int Index) {
+    sudoku_solver->tab[sudoku_solver->tabIndexZero[Index]] += 1;
+
+    if (sudoku_solver->tab[sudoku_solver->tabIndexZero[Index]] == 10) {
+        sudoku_solver->tab[sudoku_solver->tabIndexZero[Index]] = 1;
+        Sudoku_Solver_AddOne(sudoku_solver, Index + 1);
     }
 }
 
 void Sudoku_Solver_Solve(Sudoku* sudoku, int* sudokuSetChecker) {
     int k;
 
-    Sudoku_Solver* sudoku_solver = NULL;
+    Sudoku_Solver* sudoku_solver = malloc(sizeof(Sudoku_Solver));
+    sudoku_solver->tab = malloc(SUDOKU_LINE_SIZE * SUDOKU_LINE_SIZE * sizeof(int));
+    sudoku_solver->tabIndexZero = NULL;
+    sudoku_solver->tabIndexZeroSize = 0;
 
-    for (int i = 0;i < SUDOKU_LINE_SIZE * SUDOKU_LINE_SIZE;i++) {
+    for (int i = 0; i < SUDOKU_LINE_SIZE * SUDOKU_LINE_SIZE;i++) {
         sudoku_solver->tab[i] = sudoku->tab[i];
     }
 
@@ -66,7 +72,7 @@ void Sudoku_Solver_Solve(Sudoku* sudoku, int* sudokuSetChecker) {
 
     while (k != 1 || compteur < essai_max) {
 
-        Sudoku_Solver_AddOne(sudoku_solver, sudoku_solver->tabIndexZero[0]);
+        Sudoku_Solver_AddOne(sudoku_solver, 0);
         compteur++;
 
         k = Sudoku_Check(sudoku, sudokuSetChecker);
